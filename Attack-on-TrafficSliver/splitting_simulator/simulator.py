@@ -204,7 +204,12 @@ def sim_bwr(n,latencies,traces,outfiles,range_, alphas):
         routes_server = []
         sent_incomming = 0
         sent_outgoing = 0
-        last_client_route =  np.random.choice(np.arange(0,n),p = w_out)
+
+        
+        print(instance_file)
+        print(w_out)
+        last_client_route =  np.random.choice(list(range(0,n)),p = w_out)
+        # last_client_route =  np.random.choice(list(range(0,n)),p = {0.2, 0.3, 0.5})
         last_server_route = np.random.choice(np.arange(0,n),p = w_in)
 
         print(len(instance))
@@ -235,6 +240,7 @@ def sim_bwr(n,latencies,traces,outfiles,range_, alphas):
 
 
         routes = multipath.joingClientServerRoutes(routes_client,routes_server)
+        print(len(routes))
         ##### Routes Created, next to the multipath simulation
         new_instance = multipath.simulate(instance,mplatencies,routes) # Simulate the multipath effect for the given latencies and routes
         saveInFile2(instance_file,new_instance,routes,outfiles)
@@ -339,7 +345,7 @@ def sim_bwr_var_paths(n,nmin,latencies,traces,outfiles,range_, alphas):
         routes = multipath.joingClientServerRoutes(routes_client,routes_server)
         #### Routes Created, next to the multipath simulation
         new_instance = multipath.simulate(instance,mplatencies,routes) # Simulate the multipath effect for the give$
-        saveInFile2(instance_file,new_instance,routes,outfiles)
+        # saveInFile2(instance_file,new_instance,routes,outfiles)
 
 
 def sim_bwr_var_paths_strict(n,nmin,latencies,traces,outfiles,range_):
