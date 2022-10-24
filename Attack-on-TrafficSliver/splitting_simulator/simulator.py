@@ -63,9 +63,6 @@ def saveInFile2(input_name,split_inst,r,outfolder):
         outfiles.append(open(out_file_name,'w'))
 
     jointfilename = outfolder + "\\" + input_name.split('\\')[-1] + "_join"+ '.cell'
-    print(input_name)
-    print(outfolder)
-    print(jointfilename)
     jointfile = open (jointfilename,'w')
     for i in range(0,len(split_inst)):
         x_arrstr = np.char.mod('%.15f', split_inst[i][:-1])
@@ -193,12 +190,12 @@ def sim_bwr(n,latencies,traces,outfiles,range_, alphas):
     print("Simulating BWR multi-path scheme...")
     traces_file = natsorted(glob.glob(traces[0]+'/*'))
     # traces_file = natsorted(glob.glob(traces[0]+'/*.cell'))
-    print(traces_file.split('-')[0])
-    
+
     ranlow = int(range_.split(',')[0])
     ranhigh = int(range_.split(',')[1])
 
     for instance_file in traces_file:
+        print(instance_file)
         w_out = multipath.getWeights(n, alphas)
         w_in = multipath.getWeights(n, alphas)
         instance = open(instance_file,'r')
