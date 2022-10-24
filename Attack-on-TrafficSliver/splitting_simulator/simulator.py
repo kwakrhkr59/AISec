@@ -58,11 +58,14 @@ def saveInFile2(input_name,split_inst,r,outfolder):
     numberOfFiles = max(r)+1 # How many files, one per route
     outfiles = []
     for k in range(0,numberOfFiles):
-        input_name2 = input_name.split('.cell')[0].split('/')[-1]
+        input_name2 = input_name.split('\\')[-1]
         out_file_name = outfolder + "/" + input_name2 + "_split_" + str(k) + '.cell'
         outfiles.append(open(out_file_name,'w'))
 
-    jointfilename = outfolder + "/" + input_name.split('.cell')[0].split('/')[-1] + "_join"+ '.cell'
+    jointfilename = outfolder + "\\" + input_name.split('\\')[-1] + "_join"+ '.cell'
+    print(input_name)
+    print(outfolder)
+    print(jointfilename)
     jointfile = open (jointfilename,'w')
     for i in range(0,len(split_inst)):
         x_arrstr = np.char.mod('%.15f', split_inst[i][:-1])
@@ -190,6 +193,7 @@ def sim_bwr(n,latencies,traces,outfiles,range_, alphas):
     print("Simulating BWR multi-path scheme...")
     traces_file = natsorted(glob.glob(traces[0]+'/*'))
     # traces_file = natsorted(glob.glob(traces[0]+'/*.cell'))
+    print(traces_file.split('-')[0])
     
     ranlow = int(range_.split(',')[0])
     ranhigh = int(range_.split(',')[1])
@@ -206,21 +210,21 @@ def sim_bwr(n,latencies,traces,outfiles,range_, alphas):
         sent_outgoing = 0
 
         
-        print(instance_file)
-        print(w_out)
+        # print(instance_file)
+        # print(w_out)
         last_client_route =  np.random.choice(list(range(0,n)),p = w_out)
         # last_client_route =  np.random.choice(list(range(0,n)),p = {0.2, 0.3, 0.5})
         last_server_route = np.random.choice(np.arange(0,n),p = w_in)
 
-        print(len(instance))
+        # print(len(instance))
 
         for i in range(0,len(instance)):
             packet = instance[i]
             packet = packet.replace(' ','\t') #For compatibility when data is space sperated not tab separated
             
-            print("what is packet:", packet)
+            # print("what is packet:", packet)
             direction = multipath.getDirfromPacket(packet)
-            print("direction:", direction)
+            # print("direction:", direction)
             
             if (direction == 1):
                 routes_server.append(-1) # Just to know that for this packet the exit does not decide the route
@@ -240,9 +244,10 @@ def sim_bwr(n,latencies,traces,outfiles,range_, alphas):
 
 
         routes = multipath.joingClientServerRoutes(routes_client,routes_server)
-        print(len(routes))
+        # print(len(routes))
         ##### Routes Created, next to the multipath simulation
         new_instance = multipath.simulate(instance,mplatencies,routes) # Simulate the multipath effect for the given latencies and routes
+        # print(outfiles)
         saveInFile2(instance_file,new_instance,routes,outfiles)
         
 def sim_bwr_blocked(n,latencies,traces,outfiles,range_):
@@ -345,7 +350,7 @@ def sim_bwr_var_paths(n,nmin,latencies,traces,outfiles,range_, alphas):
         routes = multipath.joingClientServerRoutes(routes_client,routes_server)
         #### Routes Created, next to the multipath simulation
         new_instance = multipath.simulate(instance,mplatencies,routes) # Simulate the multipath effect for the give$
-        # saveInFile2(instance_file,new_instance,routes,outfiles)
+        saveInFile2(instance_file,new_instance,routes,outfiles)
 
 
 def sim_bwr_var_paths_strict(n,nmin,latencies,traces,outfiles,range_):
