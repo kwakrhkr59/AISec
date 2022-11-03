@@ -65,8 +65,6 @@ def count_mean(traces):
                                       'min': min(packet_list),
                                       'max': max(packet_list)}
             packet_list = []
-            if(inst_name == 10):
-                break
         cnt = len(instance)
         packet_list.append(cnt)
     df = pd.DataFrame(packet_dict).T
