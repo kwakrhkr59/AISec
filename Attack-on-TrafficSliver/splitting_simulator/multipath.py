@@ -5,7 +5,7 @@ import sys
 import noise
 
 def getTimefromPacket(packet):return float(packet.split('\t')[0])
-def getDirfromPacket(packet):return int(float(packet.split('\t')[1]))
+def getDirfromPacket(packet):return int(float(packet.split('\t')[1]))/abs(int(float(packet.split('\t')[1])))
 def getSizefromPacket(packet): #In case packet size is also present as third column in file
 	if len(packet.split('\t'))==4:
 		return int(float(packet.split('\t')[3]))
@@ -25,7 +25,6 @@ def getWeights(n,alphas):
 	return w
 
 
-
 def buildPacket(size,time,direcction):
 	return str(time) + '\t' + str(direcction) + '\t' + str(size)
 
@@ -33,7 +32,7 @@ def joingClientServerRoutes(c,s): #joing the routes choosed by client and server
 	if len(c)!= len(s):
 		sys.exit("ERROR: Client and Server routes must have the same length")
 	out = []
-	for i in xrange(0, len(c)):
+	for i in range(0, len(c)):
 		if (c[i]==-1):
 			out.append(s[i])
 		if (s[i]==-1):
@@ -48,7 +47,7 @@ def simulate(instance,mplatencies,routes):
 	delay = 0
 	time_last_incomming = 0
 	new_trace = []
-	for i  in xrange(0,len(instance)): #Iterate over each packet
+	for i  in range(0,len(instance)): #Iterate over each packet
 		last_incomming_cell = 0
 		packet = instance[i]
 		packet = packet.replace(' ','\t') #For compatibility when data is space sperated not tab separated
