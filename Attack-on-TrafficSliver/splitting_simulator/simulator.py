@@ -58,11 +58,11 @@ def saveInFile2(input_name,split_inst,r,outfolder):
     numberOfFiles = max(r)+1 # How many files, one per route
     outfiles = []
     for k in range(0,numberOfFiles):
-        input_name2 = input_name.split('\\')[-1]
+        input_name2 = input_name.split('/')[-1]
         out_file_name = outfolder + "/" + input_name2 + "_split_" + str(k) + '.cell'
         outfiles.append(open(out_file_name,'w'))
 
-    jointfilename = outfolder + "\\" + input_name.split('\\')[-1] + "_join"+ '.cell'
+    jointfilename = outfolder + "/" + input_name.split('/')[-1] + "_join"+ '.cell'
     jointfile = open (jointfilename,'w')
     for i in range(0,len(split_inst)):
         x_arrstr = np.char.mod('%.15f', split_inst[i][:-1])
