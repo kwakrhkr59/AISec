@@ -46,7 +46,6 @@ def count_packet_size(traces):
 
 def count_mean(traces):
     traces_file = natsorted(glob.glob(traces[0]+'/*'))
-    mean_list = []
     packet_list = []
     packet_dict = {}
     for instance_file in traces_file:
@@ -56,7 +55,6 @@ def count_mean(traces):
         inst_name = int(inst_name.split('\\')[1])
         inst_num = int(inst_num)
         if(inst_num == MAX_COUNT):
-            mean_list.append(mean(packet_list))
             print(inst_name, end='\t')
             print(mean(packet_list), min(packet_list), max(packet_list))
             packet_dict[inst_name] = {'mean': mean(packet_list),
