@@ -14,16 +14,16 @@ from natsort import natsorted
 import multipath
 import time
 parser = argparse.ArgumentParser()
-parser.add_argument("-s", "--scheme", type=str, help="Splitting scheme", default='round_robin') 
+parser.add_argument("-s", "--scheme", type=str, help="Splitting scheme", default='batched_weighted_random') 
 parser.add_argument("-c", "--cells", type=int, help="Cells per circuit in RR (in others it is the initial value)", default=1) 
-parser.add_argument("-m", "--circuits", type=int, help="In how many paths is the traffic divided", default=3) 
-parser.add_argument("-min", "--circuitsmin", type=int, help="In how many paths is the traffic divided", default=2) 
+parser.add_argument("-m", "--circuits", type=int, help="In how many paths is the traffic divided", default=5) 
+parser.add_argument("-min", "--circuitsmin", type=int, help="In how many paths is the traffic divided", default=5) 
 parser.add_argument("-i", "--inputs", type=str, help="Circuit latencies file", default='circuits_latencies_new.txt') 
 parser.add_argument("-o", "--outfolder", type=str, help="Folder for output files", default='outdata') 
-parser.add_argument("-w", "--weights", type=str, help="Weights for circuit (comma separated)", default='0.1,0.3,0.6') 
-parser.add_argument("-r", "--ranges", type=str, help="Range of cells after of which the wr or wrwc schduler design again", default='10,60') 
-parser.add_argument("-p",'--path', nargs='+', help=' fiPath of folder with instancesles (wang_format)')
-parser.add_argument("-a", "--alpha", type=str, help="alpha values for the Dirichlet function default np.ones(m)", default='1,1,1')
+parser.add_argument("-w", "--weights", type=str, help="Weights for circuit (comma separated)", default='0.2,0.2,0.2,0.2,0.2') 
+parser.add_argument("-r", "--ranges", type=str, help="Range of cells after of which the wr or wrwc schduler design again", default='10,40') 
+parser.add_argument("-p",'--path', nargs='+', help=' fiPath of folder with instancesles (wang_format)', default='dataset/')
+parser.add_argument("-a", "--alpha", type=str, help="alpha values for the Dirichlet function default np.ones(m)", default='1,1,1,1,1')
 
 
 
@@ -97,6 +97,56 @@ def getCircuitLatencies(l,n):
     multipath_latencies = multipath_latencies[0:n]
     return multipath_latencies
 
+def sim_bwr(n,latencies,traces,outfiles,range_, alphas):
+    print("Simulating BWR multi-path scheme...")
+    traces_file = natsorted(glob.glob(traces[0]+'/*'))  # traces_file = natsorted(glob.glob(traces[0]+'/*.cell'))
+
+    ranlow = int(range_.split(',')[0])
+    ranhigh = int(range_.split(',')[1])
+
+    for instance_file in traces_file:
+        w_out = multipath.getWeights(n, alphas)
+        w_in = multipath.getWeights(n, alphas)
+        instance = open(instance_file,'r')
+        instance = instance.read().split('\n')[:-1]
+        print(instance_file, len(instance))
+        mplatencies = getCircuitLatencies(latencies, n)	# it is a list of list of latencies for each of m circuits. length = m
+        routes_client = []
+        routes_server = []
+        sent_incomming = 0
+        sent_outgoing = 0
+
+        last_client_route =  np.random.choice(list(range(0,n)),p = w_out)
+        last_server_route = np.random.choice(np.arange(0,n),p = w_in)
+
+        for i in range(0,len(instance)):
+            packet = instance[i]
+            packet = packet.replace(' ','\t') #For compatibility when data is space sperated not tab separated
+            direction = multipath.getDirfromPacket(packet)
+            
+            if (direction == 1):
+                routes_server.append(-1) # Just to know that for this packet the exit does not decide the route
+                sent_outgoing += 1
+                C = random.randint(ranlow,ranhigh) #After how many cells the scheduler sets new weights
+                routes_client.append(last_client_route) 
+                if (sent_outgoing % C == 0): #After C cells are sent, change the circuits
+                            last_client_route =  np.random.choice(np.arange(0,n),p = w_out)
+
+            if (direction == -1): 
+                routes_client.append(-1) # Just to know that for this packet the client does not decide the route
+                routes_server.append(last_server_route)
+                sent_incomming += 1
+                C = random.randint(ranlow,ranhigh) #After how many cells the scheduler sets new weights
+                if (sent_incomming % C == 0): #After C cells are sent, change the circuits
+                     last_server_route = np.random.choice(np.arange(0,n),p = w_in)
+
+
+        routes = multipath.joingClientServerRoutes(routes_client,routes_server)
+        ##### Routes Created, next to the multipath simulation
+        new_instance = multipath.simulate(instance,mplatencies,routes) # Simulate the multipath effect for the given latencies and routes
+        saveInFile2(instance_file,new_instance,routes,outfiles)
+
+        
 def sim_random(n,latencies,traces,outfiles):
     print("Simulating Random multi-path scheme...")
     traces_file = natsorted(glob.glob(traces[0]+'/*.cell'))
@@ -186,66 +236,6 @@ def sim_in_and_out(n,latencies,traces,outfiles):
         new_instance = multipath.simulate(instance,mplatencies,routes) # Simulate the multipath effect for the given latencies and routes
         saveInFile2(instance_file,new_instance,routes,outfiles)
 
-def sim_bwr(n,latencies,traces,outfiles,range_, alphas):
-    print("Simulating BWR multi-path scheme...")
-    traces_file = natsorted(glob.glob(traces[0]+'/*'))
-    # traces_file = natsorted(glob.glob(traces[0]+'/*.cell'))
-
-    ranlow = int(range_.split(',')[0])
-    ranhigh = int(range_.split(',')[1])
-
-    for instance_file in traces_file:
-        print(instance_file)
-        w_out = multipath.getWeights(n, alphas)
-        w_in = multipath.getWeights(n, alphas)
-        instance = open(instance_file,'r')
-        instance = instance.read().split('\n')[:-1]
-        mplatencies = getCircuitLatencies(latencies, n)	# it is a list of list of latencies for each of m circuits. length = m
-        routes_client = []
-        routes_server = []
-        sent_incomming = 0
-        sent_outgoing = 0
-
-        
-        # print(instance_file)
-        # print(w_out)
-        last_client_route =  np.random.choice(list(range(0,n)),p = w_out)
-        # last_client_route =  np.random.choice(list(range(0,n)),p = {0.2, 0.3, 0.5})
-        last_server_route = np.random.choice(np.arange(0,n),p = w_in)
-
-        # print(len(instance))
-
-        for i in range(0,len(instance)):
-            packet = instance[i]
-            packet = packet.replace(' ','\t') #For compatibility when data is space sperated not tab separated
-            
-            # print("what is packet:", packet)
-            direction = multipath.getDirfromPacket(packet)
-            # print("direction:", direction)
-            
-            if (direction == 1):
-                routes_server.append(-1) # Just to know that for this packet the exit does not decide the route
-                sent_outgoing += 1
-                C = random.randint(ranlow,ranhigh) #After how many cells the scheduler sets new weights
-                routes_client.append(last_client_route) 
-                if (sent_outgoing % C == 0): #After C cells are sent, change the circuits
-                            last_client_route =  np.random.choice(np.arange(0,n),p = w_out)
-
-            if (direction == -1): 
-                routes_client.append(-1) # Just to know that for this packet the client does not decide the route
-                routes_server.append(last_server_route)
-                sent_incomming += 1
-                C = random.randint(ranlow,ranhigh) #After how many cells the scheduler sets new weights
-                if (sent_incomming % C == 0): #After C cells are sent, change the circuits
-                     last_server_route = np.random.choice(np.arange(0,n),p = w_in)
-
-
-        routes = multipath.joingClientServerRoutes(routes_client,routes_server)
-        # print(len(routes))
-        ##### Routes Created, next to the multipath simulation
-        new_instance = multipath.simulate(instance,mplatencies,routes) # Simulate the multipath effect for the given latencies and routes
-        # print(outfiles)
-        saveInFile2(instance_file,new_instance,routes,outfiles)
         
 def sim_bwr_blocked(n,latencies,traces,outfiles,range_):
     print("Simulating BWR multi-path scheme blocking last selected route...")
