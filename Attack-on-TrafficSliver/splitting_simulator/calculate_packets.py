@@ -4,9 +4,11 @@ import glob
 import argparse
 import matplotlib.pyplot as plt
 import pandas as pd
-MAX_COUNT = 100 # 샘플링 할 파일 개수
+MAX_COUNT = 100
 parser = argparse.ArgumentParser()
-parser.add_argument("-p", '--path', nargs='+', help=' fiPath of folder with instancesles (wang_format)', default='dataset/')
+parser.add_argument("-p", '--path', nargs='+',
+                    help=' fiPath of folder with instancesles (wang_format)', default='dataset/')
+
 
 def count_packet_size(traces):
     traces_file = natsorted(glob.glob(traces[0]+'/*'))
@@ -23,22 +25,26 @@ def count_packet_size(traces):
             if(inst_name != 0):
                 counts_list.append(counts_dict)
             counts_dict = {}
-            if(inst_name == 5): break
+            if(inst_name == 5):
+                break
         cnt = len(instance)
-        if(cnt not in counts_dict): counts_dict[cnt] = 0
-        counts_dict[cnt]+=1
+        if(cnt not in counts_dict):
+            counts_dict[cnt] = 0
+        counts_dict[cnt] += 1
     # last one
-    if(len(counts_dict)): counts_list.append(counts_dict)
+    if(len(counts_dict)):
+        counts_list.append(counts_dict)
     for inst_num in range(len(counts_list)):
         df = pd.Series(counts_list[inst_num])
         df = pd.DataFrame(df, columns=['counts'])
         x = df.index.to_list()
         y = df['counts']
-        plt.figure(figsize=(10,6))
+        plt.figure(figsize=(10, 6))
         plt.xlabel('packet')
         plt.ylabel('number of packets')
         plt.bar(x, y)
-        plt.savefig("./images/new traffic counts-"+str(inst_num)+".png")
+        plt.savefig("./images/traffic counts-"+str(inst_num)+".png")
+
 
 def count_mean(traces):
     traces_file = natsorted(glob.glob(traces[0]+'/*'))
@@ -56,10 +62,11 @@ def count_mean(traces):
             print(inst_name, end='\t')
             print(mean(packet_list), min(packet_list), max(packet_list))
             packet_dict[inst_name] = {'mean': mean(packet_list),
-                                        'min': min(packet_list),
-                                        'max': max(packet_list)}
+                                      'min': min(packet_list),
+                                      'max': max(packet_list)}
             packet_list = []
-            if(inst_name==10): break
+            if(inst_name == 10):
+                break
         cnt = len(instance)
         packet_list.append(cnt)
     df = pd.DataFrame(packet_dict).T
@@ -69,7 +76,7 @@ def count_mean(traces):
     y_mean = df['mean']
     y_min = df['min']
     y_max = df['max']
-    plt.figure(figsize=(10,6))
+    plt.figure(figsize=(10, 6))
     plt.xlabel('packet')
     plt.ylabel('num of instance')
     plt.plot(x, y_mean, label='mean')
