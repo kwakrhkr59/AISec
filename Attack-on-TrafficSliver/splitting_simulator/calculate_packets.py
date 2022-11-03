@@ -4,28 +4,28 @@ import glob
 import argparse
 import matplotlib.pyplot as plt
 import pandas as pd
-MAX_COUNT=100 # 샘플링 할 파일 개수
+MAX_COUNT = 100 # 샘플링 할 파일 개수
 parser = argparse.ArgumentParser()
 parser.add_argument("-p", '--path', nargs='+', help=' fiPath of folder with instancesles (wang_format)', default='dataset/')
 
 def count_packet_size(traces):
     traces_file = natsorted(glob.glob(traces[0]+'/*'))
-    counts_dict={}
-    counts_list=[]
+    counts_dict = {}
+    counts_list = []
     for instance_file in traces_file:
         instance = open(instance_file, 'r')
         instance = instance.read().split('\n')[:-1]
         inst_name, inst_num = instance_file.split('-')
         inst_name = int(inst_name.split('\\')[1])
-        inst_num=int(inst_num)
+        inst_num = int(inst_num)
         if(inst_num == 0):
             print(inst_name)
             if(inst_name != 0):
                 counts_list.append(counts_dict)
-            counts_dict={}
-            if(inst_name==5): break
-        cnt=len(instance)
-        if(cnt not in counts_dict): counts_dict[cnt]=0
+            counts_dict = {}
+            if(inst_name == 5): break
+        cnt = len(instance)
+        if(cnt not in counts_dict): counts_dict[cnt] = 0
         counts_dict[cnt]+=1
     # last one
     if(len(counts_dict)): counts_list.append(counts_dict)
@@ -50,7 +50,7 @@ def count_mean(traces):
         instance = instance.read().split('\n')[:-1]
         inst_name, inst_num = instance_file.split('-')
         inst_name = int(inst_name.split('\\')[1])
-        inst_num=int(inst_num)
+        inst_num = int(inst_num)
         if(inst_num == MAX_COUNT):
             mean_list.append(mean(packet_list))
             print(inst_name, end='\t')
