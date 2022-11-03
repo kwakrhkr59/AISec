@@ -82,5 +82,5 @@ def count_mean(traces):
 if __name__ == '__main__':
     args = parser.parse_args()
     traces = args.path
-    # count_mean(traces)
+    count_mean(traces)
     count_packet_size(traces)
