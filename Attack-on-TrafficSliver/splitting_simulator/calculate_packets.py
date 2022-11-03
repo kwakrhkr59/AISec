@@ -25,8 +25,6 @@ def count_packet_size(traces):
             if(inst_name != 0):
                 counts_list.append(counts_dict)
             counts_dict = {}
-            if(inst_name == 5):
-                break
         cnt = len(instance)
         if(cnt not in counts_dict):
             counts_dict[cnt] = 0
