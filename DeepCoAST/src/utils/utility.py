@@ -428,16 +428,16 @@ if __name__=="__main__":
     # get_max_len('/data/TrafficSliver/BigEnough/splitted/unmon19/mode3/unmon19_directions.pickle')
     # get_max_len('/data/TrafficSliver/BigEnough/splitted/mon/mode3/mon_directions.pickle')
     # open_pickle('/home/kwakrhkr59/Deepcoffea/data/crawle_new_overlap_interval19000_win0_addn0_w_superpkt.pickle')
-    open_pickle('/scratch/TrafficSliver/FINAL/ts3/dataset/50_70/0.33_0.33_0.34/tam1d/test_path0.pkl')
+    # open_pickle('/scratch/TrafficSliver/FINAL/ts3/dataset/50_70/0.33_0.33_0.34/tam1d/test_path0.pkl')
     # open_npz(pickle_file)
     # open_cell(traces)
-    # 1단계: cell 파일들 -> directions.pickle
+    # 1st stage: .cell -> directions.pickle
     # merge_cell_mon_2(traces, outfolder)
     # merge_cell_unmon(traces, outfolder)
-    # 2단계: directions.pickle -> X.pkl, y.pkl
+    # 2nd stage: directions.pickle -> X.pkl, y.pkl
     # get_data_mon(pickle_file, outfolder)
     # get_data_unmon(pickle_file, outfolder)
-    # 3단계: X.pkl, y.pkl -> train, valid, test
+    # 3rd stage: X.pkl, y.pkl -> train, valid, test
     # split_mon(directory, outfolder)
     # split_unmon(directory, outfolder)
     # multiply(directory, outfolder)
