@@ -8,16 +8,7 @@ MAX_COUNT = 100
 parser = argparse.ArgumentParser()
 parser.add_argument("-p", '--path', nargs='+', help=' fiPath of folder with instancesles (wang_format)', default='/data/TrafficSliver/BigEnough/splitted/mon/mode1/ts')
 
-# def count_packet_thresh(output, traces, thresh):
-#     traces_file = natsorted(glob.glob(traces[0]+'/*'))
-#     for instance_file in traces_file:
-#         instance = open(instance_file, 'r')
-#         instance = instance.read().split('\n')[:-1]
-#         if (len(instance) == 0):
-
-
-
-def count_packet_size2(traces, thresh):
+def count_packet_size(traces, thresh):
     traces_file = natsorted(glob.glob(traces[0]+'/*'))
     counts_dict = {}
     counts_list = []
@@ -49,7 +40,7 @@ def count_packet_size2(traces, thresh):
         plt.xlabel('packet')
         plt.ylabel('number of packets')
         plt.bar(x, y)
-        plt.savefig("./images/traffic counts-"+str(site)+".png")
+        plt.savefig(f"../images/traffic_counts_{site}.png")
 
 def count_packet_size(traces):
     traces_file = natsorted(glob.glob(traces[0]+'/*'))
@@ -71,18 +62,18 @@ def count_packet_size(traces):
             counts_dict[cnt] = 0
         counts_dict[cnt] += 1
     # last one
-    if(len(counts_dict)):
+    if (len(counts_dict)):
         counts_list.append(counts_dict)
     for inst_num in range(len(counts_list)):
         df = pd.Series(counts_list[inst_num])
         df = pd.DataFrame(df, columns=['counts'])
         x = df.index.to_list()
         y = df['counts']
-        # plt.figure(figsize=(10, 6))
-        # plt.xlabel('packet')
-        # plt.ylabel('number of packets')
-        # plt.bar(x, y)
-        # plt.savefig("./images/traffic counts-"+str(inst_num)+".png")
+        plt.figure(figsize=(10, 6))
+        plt.xlabel('packet')
+        plt.ylabel('number of packets')
+        plt.bar(x, y)
+        plt.savefig(f"../images/traffic_counts_{site}.png")
 
 def count_timestamp(traces):
     traces_file = natsorted(glob.glob(traces+'/*'))
@@ -127,7 +118,7 @@ def count_timestamp(traces):
                                 'min': min(packet_list),
                                 'max': max(packet_list)}
     df = pd.DataFrame(packet_dict).T
-    df.to_csv('/home/kwakrhkr59/TrafficSliver/splitting_simulator/csv/mon_mode1_timestamp.csv')
+    df.to_csv('../csv/traces_timestamp.csv')
 
 def count_mean(traces):
     traces_file = natsorted(glob.glob(traces+'/*'))
@@ -171,24 +162,4 @@ def count_mean(traces):
                                 'min': min(packet_list),
                                 'max': max(packet_list)}
     df = pd.DataFrame(packet_dict).T
-    df.to_csv('/home/kwakrhkr59/TrafficSliver/splitting_simulator/csv/mon_mode1_size.csv')
-    # save as an image
-    x = df.index.to_list()
-    y_mean = df['mean']
-    y_min = df['min']
-    y_max = df['max']
-    # plt.figure(figsize=(10, 6))
-    # plt.xlabel('packet')
-    # plt.ylabel('num of instance')
-    # plt.plot(x, y_mean, label='mean')
-    # plt.plot(x, y_min, label='min')
-    # plt.plot(x, y_max, label='max')
-    # plt.legend(loc='best')
-    # plt.savefig("./images/mean.png")
-
-if __name__ == '__main__':
-    args = parser.parse_args()
-    traces = args.path
-    # count_mean(traces)
-    # count_timestamp(traces)
-    # count_packet_size(traces)
+    df.to_csv('../csv/traces_mean.csv')
