@@ -4,6 +4,7 @@ import argparse
 import numpy as np
 import pickle
 import os
+
 def open_pickle(directory, path):
     handle = open(path, 'rb')
     directions = pickle.load(handle, encoding = 'latin1')
@@ -22,6 +23,3 @@ def open_pickle(directory, path):
                 data = str(abs(p)) + "\t" + str(dir) + "\t" + str(dir*512) + "\n"
                 f.write(data)
             f.close()
-
-directory = '/data/TrafficSliver/wf-singlesite/original/mon_webmd'
-open_pickle(directory, '/data/TrafficSliver/wf-singlesite/cleaned_webmd_data_all.pkl')
