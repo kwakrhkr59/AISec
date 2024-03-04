@@ -1,2 +1,2 @@
 # AISec
-2022 Ewha AISec - Project 2
+Undergraduate Internship - Ewha Womans University Artificial Intelligence Security Lab
